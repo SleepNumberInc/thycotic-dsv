@@ -14,7 +14,7 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   const pipeline = promisify(stream.pipeline);
 
   const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
-  const fileName = 'bin/dsv';
+  const fileName = 'dsv';
 
   const downloadStream = got.stream(url);
   const fileWriterStream = createWriteStream(fileName);
@@ -25,35 +25,31 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   });
 
   (async () => {
-    try {
-      await pipeline(downloadStream, fileWriterStream);
-      core.debug(`File downloaded to ${fileName}`);
-      const { exec } = __nccwpck_require__(3129);
-      exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
-        if (error) {
-          core.error(error.message);
-          return;
-        }
-        if (stderr) {
-          core.error(stderr);
-          return;
-        }
-        core.info(stdout);
+    await pipeline(downloadStream, fileWriterStream);
+    core.debug(`File downloaded to ${fileName}`);
+    const { exec } = __nccwpck_require__(3129);
+    exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+      if (error) {
+        core.error(error.message);
+        return;
+      }
+      if (stderr) {
+        core.error(stderr);
+        return;
+      }
+      core.info(stdout);
 
-        // Parse JSON payload from the dsv cli output
-        const secrets = JSON.parse(stdout);
+      // Parse JSON payload from the dsv cli output
+      const secrets = JSON.parse(stdout);
 
-        // Mark string values as secret and obfuscate in console if displayed
-        // Set action outputs
-        for (var attributeName in secrets) {
-          core.setSecret(secrets[attributeName])
+      // Mark string values as secret and obfuscate in console if displayed
+      // Set action outputs
+      for (var attributeName in secrets) {
+        core.setSecret(secrets[attributeName])
 
-          core.setOutput(attributeName, secrets[attributeName])
-        }
-      });
-    } catch (error) {
-      core.error(error.message);
-    }
+        core.setOutput(attributeName, secrets[attributeName])
+      }
+    });
   })();
 };
 
