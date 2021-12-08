@@ -51,7 +51,7 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       core.info(stdout);
     });
 
-    exec(`./${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+    exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
       if (error) {
         core.error(error.message);
         return;
