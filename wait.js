@@ -1,4 +1,4 @@
-let wait = async function () {
+let wait = async function (dsv_user, dsv_password, dsv_path) {
 
   const core = require('@actions/core');
   const got = require("got");
@@ -23,19 +23,19 @@ let wait = async function () {
       await pipeline(downloadStream, fileWriterStream);
       core.debug(`File downloaded to ${fileName}`);
       const { exec } = require("child_process");
-      exec("dsv", (error, stdout, stderr) => {
+      exec(`dsv secret read "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
         if (error) {
-            console.log(`error: ${error.message}`);
+            core.error(error.message);
             return;
         }
         if (stderr) {
-            console.log(`stderr: ${stderr}`);
+            core.error(stderr);
             return;
         }
-        console.log(`stdout: ${stdout}`);
+        core.info(stdout);
       });
     } catch (error) {
-      console.error(`Something went wrong. ${error.message}`);
+      console.error(error.message);
     }
   })();
 };

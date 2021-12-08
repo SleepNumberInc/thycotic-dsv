@@ -5,14 +5,16 @@ const wait = require('./wait');
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const dsv_user = core.getInput('dsv_user');
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait();
-    core.info((new Date()).toTimeString());
+    const dsv_password = core.getInput('dsv_password');
+    core.setSecret(dsv_password);
 
-    core.setOutput('time', new Date().toTimeString());
+    const dsv_path = core.getInput('dsv_path');
+
+    core.info(`Fetching secrets from ${dsv_path} ...`);
+
+    await wait(dsv_user, dsv_password, dsv_path);
   } catch (error) {
     core.setFailed(error.message);
   }
