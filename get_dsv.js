@@ -8,7 +8,7 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   const pipeline = promisify(stream.pipeline);
 
   const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
-  const fileName = 'bin/dsv';
+  const fileName = 'dsv';
 
   const downloadStream = got.stream(url);
   const fileWriterStream = createWriteStream(fileName);
