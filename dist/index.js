@@ -21,12 +21,16 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
     const percentage = Math.round(percent * 100);
-    core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
+
+    if (percent % 10 === 0)
+    {
+      core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
+    }
   });
 
   (async () => {
     await pipeline(downloadStream, fileWriterStream);
-    //core.debug(`File downloaded to ${fileName}`);
+    core.debug(`File downloaded to ${fileName}`);
     const { exec } = __nccwpck_require__(3129);
 
     exec("chmod +x dsv", (error, stdout, stderr) => {
