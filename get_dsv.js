@@ -16,7 +16,7 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
     const percentage = Math.round(percent * 100);
 
-    if (percent % 10 === 0)
+    if (percentage % 10 === 0)
     {
       core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
     }
