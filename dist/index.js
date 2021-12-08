@@ -1,6 +1,67 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 4094:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
+
+  const core = __nccwpck_require__(2186);
+  const got = __nccwpck_require__(3061);
+  const { createWriteStream } = __nccwpck_require__(5747);
+  const stream = __nccwpck_require__(2413);
+  const { promisify } = __nccwpck_require__(1669);
+  const pipeline = promisify(stream.pipeline);
+
+  const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
+  const fileName = 'bin/dsv';
+
+  const downloadStream = got.stream(url);
+  const fileWriterStream = createWriteStream(fileName);
+
+  downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
+    const percentage = Math.round(percent * 100);
+    core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
+  });
+
+  (async () => {
+    try {
+      await pipeline(downloadStream, fileWriterStream);
+      core.debug(`File downloaded to ${fileName}`);
+      const { exec } = __nccwpck_require__(3129);
+      exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+        if (error) {
+          core.error(error.message);
+          return;
+        }
+        if (stderr) {
+          core.error(stderr);
+          return;
+        }
+        core.info(stdout);
+
+        // Parse JSON payload from the dsv cli output
+        const secrets = JSON.parse(stdout);
+
+        // Mark string values as secret and obfuscate in console if displayed
+        // Set action outputs
+        for (var attributeName in secrets) {
+          core.setSecret(secrets[attributeName])
+
+          core.setOutput(attributeName, secrets[attributeName])
+        }
+      });
+    } catch (error) {
+      core.error(error.message);
+    }
+  })();
+};
+
+module.exports = wait;
+
+
+/***/ }),
+
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9302,67 +9363,6 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 4258:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
-
-  const core = __nccwpck_require__(2186);
-  const got = __nccwpck_require__(3061);
-  const { createWriteStream } = __nccwpck_require__(5747);
-  const stream = __nccwpck_require__(2413);
-  const { promisify } = __nccwpck_require__(1669);
-  const pipeline = promisify(stream.pipeline);
-
-  const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
-  const fileName = 'bin/dsv';
-
-  const downloadStream = got.stream(url);
-  const fileWriterStream = createWriteStream(fileName);
-
-  downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
-    const percentage = Math.round(percent * 100);
-    core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
-  });
-
-  (async () => {
-    try {
-      await pipeline(downloadStream, fileWriterStream);
-      core.debug(`File downloaded to ${fileName}`);
-      const { exec } = __nccwpck_require__(3129);
-      exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
-        if (error) {
-          core.error(error.message);
-          return;
-        }
-        if (stderr) {
-          core.error(stderr);
-          return;
-        }
-        core.info(stdout);
-
-        // Parse JSON payload from the dsv cli output
-        const secrets = JSON.parse(stdout);
-
-        // Mark string values as secret and obfuscate in console if displayed
-        // Set action outputs
-        for (var attributeName in secrets) {
-          core.setSecret(secrets[attributeName])
-
-          core.setOutput(attributeName, secrets[attributeName])
-        }
-      });
-    } catch (error) {
-      core.error(error.message);
-    }
-  })();
-};
-
-module.exports = wait;
-
-
-/***/ }),
-
 /***/ 2357:
 /***/ ((module) => {
 
@@ -9541,7 +9541,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(2186);
-const wait = __nccwpck_require__(4258);
+const wait = __nccwpck_require__(4094);
 
 
 // most @actions toolkit packages have async methods

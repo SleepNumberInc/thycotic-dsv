@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const wait = require('./get_dsv.js');
 
 
 // most @actions toolkit packages have async methods
