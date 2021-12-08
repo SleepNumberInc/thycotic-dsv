@@ -28,6 +28,33 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
     await pipeline(downloadStream, fileWriterStream);
     core.debug(`File downloaded to ${fileName}`);
     const { exec } = __nccwpck_require__(3129);
+
+
+    exec("pwd", (error, stdout, stderr) => {
+      if (error) {
+        core.error(error.message);
+        return;
+      }
+      if (stderr) {
+        core.error(stderr);
+        return;
+      }
+      core.info(stdout);
+    });
+
+    exec("ls -alh", (error, stdout, stderr) => {
+      if (error) {
+        core.error(error.message);
+        return;
+      }
+      if (stderr) {
+        core.error(stderr);
+        return;
+      }
+      core.info(stdout);
+    });
+
+
     exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
       if (error) {
         core.error(error.message);
