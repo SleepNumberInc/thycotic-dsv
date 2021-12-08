@@ -23,7 +23,7 @@ let wait = async function (dsv_user, dsv_password, dsv_path) {
       await pipeline(downloadStream, fileWriterStream);
       core.debug(`File downloaded to ${fileName}`);
       const { exec } = require("child_process");
-      exec(`dsv secret read "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+      exec(`${fileName} secret read "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
         if (error) {
             core.error(error.message);
             return;
