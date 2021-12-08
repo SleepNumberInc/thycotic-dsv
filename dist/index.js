@@ -9305,7 +9305,7 @@ function wrappy (fn, cb) {
 /***/ 4258:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-let wait = async function (dsv_user, dsv_password, dsv_path) {
+let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   const core = __nccwpck_require__(2186);
   const got = __nccwpck_require__(3061);
@@ -9314,13 +9314,13 @@ let wait = async function (dsv_user, dsv_password, dsv_path) {
   const { promisify } = __nccwpck_require__(1669);
   const pipeline = promisify(stream.pipeline);
 
-  const url = "https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64";
-  const fileName = "bin/dsv";
+  const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
+  const fileName = 'bin/dsv';
 
   const downloadStream = got.stream(url);
   const fileWriterStream = createWriteStream(fileName);
 
-  downloadStream.on("downloadProgress", ({ transferred, total, percent }) => {
+  downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
     const percentage = Math.round(percent * 100);
     core.debug(`progress: ${transferred}/${total} (${percentage}%)`);
   });
@@ -9330,7 +9330,7 @@ let wait = async function (dsv_user, dsv_password, dsv_path) {
       await pipeline(downloadStream, fileWriterStream);
       core.debug(`File downloaded to ${fileName}`);
       const { exec } = __nccwpck_require__(3129);
-      exec(`${fileName} secret read "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+      exec(`${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
         if (error) {
           core.error(error.message);
           return;
@@ -9340,9 +9340,20 @@ let wait = async function (dsv_user, dsv_password, dsv_path) {
           return;
         }
         core.info(stdout);
+
+        // Parse JSON payload from the dsv cli output
+        const secrets = JSON.parse(stdout);
+
+        // Mark string values as secret and obfuscate in console if displayed
+        // Set action outputs
+        for (var attributeName in secrets) {
+          core.setSecret(secrets[attributeName])
+
+          core.setOutput(attributeName, secrets[attributeName])
+        }
       });
     } catch (error) {
-      console.error(error.message);
+      core.error(error.message);
     }
   })();
 };
@@ -9536,6 +9547,8 @@ const wait = __nccwpck_require__(4258);
 // most @actions toolkit packages have async methods
 async function run() {
   try {
+    const dsv_tenant = core.getInput('dsv_tenant');
+
     const dsv_user = core.getInput('dsv_user');
 
     const dsv_password = core.getInput('dsv_password');
@@ -9545,7 +9558,7 @@ async function run() {
 
     core.info(`Fetching secrets from ${dsv_path} ...`);
 
-    await wait(dsv_user, dsv_password, dsv_path);
+    await wait(dsv_tenant, dsv_user, dsv_password, dsv_path);
   } catch (error) {
     core.setFailed(error.message);
   }
