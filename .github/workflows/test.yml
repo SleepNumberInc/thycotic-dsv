@@ -19,9 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    
     - uses: ./
+      id: dsv
       with:
         dsv_tenant: ${{ secrets.DSV_TENANT }}
         dsv_user: ${{ secrets.DSV_USER }}
         dsv_password: ${{ secrets.DSV_PASSWORD }}
         dsv_path: ${{ secrets.DSV_PATH }}
+
+    - name: Print secrets
+      run: |
+        echo "${{ steps.dsv.outputs.Description }}" 
+        echo "${{ steps.dsv.outputs.Password }}" 
+        echo "${{ steps.dsv.outputs.client_id }}" 
+        echo "${{ steps.dsv.outputs.client_secret }}" 
