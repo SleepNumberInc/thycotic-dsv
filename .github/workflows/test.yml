@@ -32,5 +32,7 @@ jobs:
       run: |
         echo "${{ steps.dsv.outputs.Description }}" 
         echo "${{ steps.dsv.outputs.Password }}" 
+        echo "${{ steps.dsv.outputs.NON_EXISTENT }}" 
         echo "${{ steps.dsv.outputs.client_id }}" 
         echo "${{ steps.dsv.outputs.client_secret }}" 
+    
