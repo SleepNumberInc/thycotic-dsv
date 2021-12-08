@@ -26,11 +26,10 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   (async () => {
     await pipeline(downloadStream, fileWriterStream);
-    core.debug(`File downloaded to ${fileName}`);
+    //core.debug(`File downloaded to ${fileName}`);
     const { exec } = __nccwpck_require__(3129);
 
-
-    exec("pwd", (error, stdout, stderr) => {
+    exec("chmod +x dsv", (error, stdout, stderr) => {
       if (error) {
         core.error(error.message);
         return;
@@ -53,7 +52,6 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       }
       core.info(stdout);
     });
-
 
     exec(`./${fileName} secret read -t "${dsv_tenant}" "${dsv_path}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
       if (error) {
