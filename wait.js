@@ -33,6 +33,14 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
           return;
         }
         core.info(stdout);
+
+        // Parse JSON payload from the dsv cli output
+        const secrets = JSON.parse(stdout);
+
+        // Mark string values as secret and obfuscate in console if displayed
+        for (var attributeName in secrets) {
+          core.setSecret(secrets[attributeName])
+        }
       });
     } catch (error) {
       core.error(error.message);
