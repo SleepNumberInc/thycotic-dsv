@@ -8,19 +8,20 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   const core = __nccwpck_require__(2186);
   const got = __nccwpck_require__(3061);
-  const fs = __nccwpck_require__(7147);
   const { createWriteStream } = __nccwpck_require__(7147);
   const stream = __nccwpck_require__(2781);
   const { promisify } = __nccwpck_require__(3837);
   const pipeline = promisify(stream.pipeline);
 
-  // const url = 'https://github.com/thycotic/dsv-cli/releases/latest/download/dsv-linux-x64';
+  // Need to update every month with each release
   const url = 'https://dsv.thycotic.com/downloads/cli/1.29.0/dsv-linux-x64';
   const fileName = 'dsv';
 
+  // Open streams to read and write the file
   const downloadStream = got.stream(url);
   const fileWriterStream = createWriteStream(fileName);
 
+  // Display download progress
   downloadStream.on('downloadProgress', ({ transferred, total, percent }) => {
     const percentage = Math.round(percent * 100);
 
@@ -29,64 +30,17 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
     }
   });
 
+  // Create function to download DSV cli binary and write the file
   async function createFile() {
     await pipeline(downloadStream, fileWriterStream);
     core.debug(`File downloaded to ${fileName}`);
-    // const { exec } = require("child_process");
-
-    // exec("chmod 777 dsv", (error, stdout, stderr) => {
-    //   if (error) {
-    //     core.error(error.message);
-    //     return;
-    //   }
-    //   if (stderr) {
-    //     core.error(stderr);
-    //     return;
-    //   }
-    // });
-
-    // exec("ls -la", (error, stdout, stderr) => {
-    //   if (error) {
-    //     core.error(error.message);
-    //     return;
-    //   }
-    //   if (stderr) {
-    //     core.error(stderr);
-    //     return;
-    //   }
-    //   if (stdout) {
-    //     core.info(stdout);
-    //     return;
-    //   }
-    // });
-
-    // exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
-    //   if (error) {
-    //     core.error(error.message);
-    //     return;
-    //   }
-    //   if (stderr) {
-    //     core.error(stderr);
-    //     return;
-    //   }
-
-    //   // Parse JSON payload from the dsv cli output
-    //   const secrets = JSON.parse(stdout);
-
-    //   // Mark string values as secret and obfuscate in console if displayed
-    //   // Set action outputs
-    //   for (var attributeName in secrets) {
-    //     core.setSecret(secrets[attributeName])
-    //     //core.setOutput(attributeName, secrets[attributeName])
-    //   }
-
-    //   core.setOutput('payload', JSON.stringify(secrets))
-    // });
   };
+
+  // Call function and wait for it to complete
   await createFile();
+
   const { exec } = __nccwpck_require__(2081);
-
-
+  // Change file permissions
   exec("chmod 777 dsv", (error, stdout, stderr) => {
     if (error) {
       core.error(error.message);
@@ -98,7 +52,7 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
     }
   });
 
-  exec("ls -la", (error, stdout, stderr) => {
+  exec("ls -l", (error, stdout, stderr) => {
     if (error) {
       core.error(error.message);
       return;
@@ -108,11 +62,12 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       return;
     }
     if (stdout) {
-      core.info(stdout);
+      core.debug(stdout);
       return;
     }
   });
 
+  // Call dsv to read the secret with the parameters specified
   exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
     if (error) {
       core.error(error.message);
@@ -136,8 +91,6 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
     core.setOutput('payload', JSON.stringify(secrets))
   });
 };
-
-
 
 module.exports = dsv;
 
