@@ -7,7 +7,8 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   const { promisify } = require('util');
   const pipeline = promisify(stream.pipeline);
 
-  const url = 'https://github.com/thycotic/dsv-cli/releases/latest/download/dsv-linux-x64';
+  // const url = 'https://github.com/thycotic/dsv-cli/releases/latest/download/dsv-linux-x64';
+  const url = 'https://dsv.thycotic.com/downloads/cli/1.29.0/dsv-linux-x64';
   const fileName = 'dsv';
 
   const downloadStream = got.stream(url);
