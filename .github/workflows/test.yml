@@ -30,4 +30,4 @@ jobs:
 
     - name: Print secrets
       run: |
-        echo "${{ fromJSON(steps.dsv.outputs.payload) }}" 
+        echo "${{ steps.dsv.outputs.payload }}" 

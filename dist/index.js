@@ -61,9 +61,10 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       // Set action outputs
       for (var attributeName in secrets) {
         core.setSecret(secrets[attributeName])
-
-        core.setOutput(attributeName, secrets[attributeName])
+        //core.setOutput(attributeName, secrets[attributeName])
       }
+
+      core.setOutput('payload', JSON.stringify(secrets))
     });
   })();
 };
@@ -9552,7 +9553,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(2186);
-const wait = __nccwpck_require__(4094);
+const dsv = __nccwpck_require__(4094);
 
 
 // most @actions toolkit packages have async methods
@@ -9569,7 +9570,7 @@ async function run() {
 
     core.info(`Fetching secrets from ${dsv_path} ...`);
 
-    await wait(dsv_tenant, dsv_user, dsv_password, dsv_path);
+    await dsv(dsv_tenant, dsv_user, dsv_password, dsv_path);
   } catch (error) {
     core.setFailed(error.message);
   }
