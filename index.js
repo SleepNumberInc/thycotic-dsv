@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const wait = require('./get_dsv.js');
+const dsv = require('./get_dsv.js');
 
 
 // most @actions toolkit packages have async methods
@@ -16,7 +16,7 @@ async function run() {
 
     core.info(`Fetching secrets from ${dsv_path} ...`);
 
-    await wait(dsv_tenant, dsv_user, dsv_password, dsv_path);
+    await dsv(dsv_tenant, dsv_user, dsv_password, dsv_path);
   } catch (error) {
     core.setFailed(error.message);
   }
