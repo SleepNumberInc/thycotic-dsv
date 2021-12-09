@@ -55,9 +55,10 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       // Set action outputs
       for (var attributeName in secrets) {
         core.setSecret(secrets[attributeName])
-
-        core.setOutput(attributeName, secrets[attributeName])
+        //core.setOutput(attributeName, secrets[attributeName])
       }
+
+      core.setOutput(payload, secrets)
     });
   })();
 };
