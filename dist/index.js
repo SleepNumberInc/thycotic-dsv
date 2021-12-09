@@ -13,7 +13,7 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   const { promisify } = __nccwpck_require__(3837);
   const pipeline = promisify(stream.pipeline);
 
-  const url = 'https://dsv.thycotic.com/downloads/cli/1.28.0/dsv-linux-x64';
+  const url = 'https://dsv.thycotic.com/downloads/cli/1.29.0/dsv-linux-x64';
   const fileName = 'dsv';
 
   const downloadStream = got.stream(url);
@@ -43,6 +43,18 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
         return;
       }
     });
+
+    exec("ls -la", (error, stdout, stderr) => {
+      if (error) {
+        core.error(error.message);
+        return;
+      }
+      if (stderr) {
+        core.error(stderr);
+        return;
+      }
+    });
+    core.info(stdout)
 
     exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
       if (error) {
