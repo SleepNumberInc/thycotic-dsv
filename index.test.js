@@ -1,5 +1,5 @@
-const wait = require('./get_dsv.js');
+const dsv = require('./get_dsv.js');
 
 test('throws invalid number', async () => {
-  await expect(wait('foo')).rejects.toThrow('milliseconds not a number');
+  await expect(dsv('foo')).rejects.toThrow('milliseconds not a number');
 });

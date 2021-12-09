@@ -37,58 +37,59 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   };
 
   // Call function and wait for it to complete
-  await createFile();
+  createFile().then(res => {
 
-  const { exec } = __nccwpck_require__(2081);
-  // Change file permissions
-  exec("chmod 777 dsv", (error, stdout, stderr) => {
-    if (error) {
-      core.error(error.message);
-      return;
-    }
-    if (stderr) {
-      core.error(stderr);
-      return;
-    }
-  });
+    const { exec } = __nccwpck_require__(2081);
+    // Change file permissions
+    exec("chmod 777 dsv", (error, stdout, stderr) => {
+      if (error) {
+        core.setFailed(error.message);
+        return;
+      }
+      if (stderr) {
+        core.setFailed(stderr);
+        return;
+      }
+    });
 
-  exec("ls -l", (error, stdout, stderr) => {
-    if (error) {
-      core.error(error.message);
-      return;
-    }
-    if (stderr) {
-      core.error(stderr);
-      return;
-    }
-    if (stdout) {
-      core.debug(stdout);
-      return;
-    }
-  });
+    exec("ls -l", (error, stdout, stderr) => {
+      if (error) {
+        core.setFailed(error.message);
+        return;
+      }
+      if (stderr) {
+        core.setFailed(stderr);
+        return;
+      }
+      if (stdout) {
+        core.debug(stdout);
+        return;
+      }
+    });
 
-  // Call dsv to read the secret with the parameters specified
-  exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
-    if (error) {
-      core.error(error.message);
-      return;
-    }
-    if (stderr) {
-      core.error(stderr);
-      return;
-    }
+    // Call dsv to read the secret with the parameters specified
+    exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
+      if (error) {
+        core.setFailed(error.message);
+        return;
+      }
+      if (stderr) {
+        core.setFailed(stderr);
+        return;
+      }
 
-    // Parse JSON payload from the dsv cli output
-    const secrets = JSON.parse(stdout);
+      // Parse JSON payload from the dsv cli output
+      const secrets = JSON.parse(stdout);
 
-    // Mark string values as secret and obfuscate in console if displayed
-    // Set action outputs
-    for (var attributeName in secrets) {
-      core.setSecret(secrets[attributeName])
-      //core.setOutput(attributeName, secrets[attributeName])
-    }
+      // Mark string values as secret and obfuscate in console if displayed
+      // Set action outputs
+      for (var attributeName in secrets) {
+        core.setSecret(secrets[attributeName])
+        //core.setOutput(attributeName, secrets[attributeName])
+      }
 
-    core.setOutput('payload', JSON.stringify(secrets))
+      core.setOutput('payload', JSON.stringify(secrets))
+    });
   });
 };
 
