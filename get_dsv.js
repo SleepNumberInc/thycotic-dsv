@@ -1,4 +1,4 @@
-let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
+let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   const core = require('@actions/core');
   const got = require('got');
@@ -63,4 +63,4 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   })();
 };
 
-module.exports = wait;
+module.exports = dsv;

@@ -4,7 +4,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /***/ 4094:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
+let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
 
   const core = __nccwpck_require__(2186);
   const got = __nccwpck_require__(3061);
@@ -69,7 +69,7 @@ let wait = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
   })();
 };
 
-module.exports = wait;
+module.exports = dsv;
 
 
 /***/ }),
