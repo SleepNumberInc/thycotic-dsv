@@ -38,6 +38,18 @@ let dsv = async function (dsv_tenant, dsv_user, dsv_password, dsv_path) {
       }
     });
 
+    exec("ls -la", (error, stdout, stderr) => {
+      if (error) {
+        core.error(error.message);
+        return;
+      }
+      if (stderr) {
+        core.error(stderr);
+        return;
+      }
+    });
+    core.info(stdout)
+
     exec(`./${fileName} secret read "${dsv_path}" -t "${dsv_tenant}" -u "${dsv_user}" -p "${dsv_password}" -f .data`, (error, stdout, stderr) => {
       if (error) {
         core.error(error.message);
