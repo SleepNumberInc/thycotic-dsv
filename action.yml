@@ -1,13 +1,24 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: DSV retriever action
+description: Fetch secrets from Thycotic DSV server for use in GitHub Actions pipeline
+
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  dsv_tenant:
+    description: Id of the Tenant for your organization on Thycotic DSV
     required: true
-    default: '1000'
+  dsv_user:
+    description: User with access to fetch secrets in the given path
+    required: true
+  dsv_password:
+    description: Password for the user to fetch secrets
+    required: true
+  dsv_path:
+    description: Base path where secrets are stored to be fetched for use in the pipeline
+    required: true
+
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  payload:
+    description: JSON payload containing the secrets retrieved from the server for use in the pipeline (use `fromJSON()`)
+
 runs:
   using: 'node12'
   main: 'dist/index.js'

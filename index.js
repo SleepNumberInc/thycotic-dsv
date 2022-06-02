@@ -1,18 +1,22 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const dsv = require('./get_dsv.js');
 
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const dsv_tenant = core.getInput('dsv_tenant');
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const dsv_user = core.getInput('dsv_user');
 
-    core.setOutput('time', new Date().toTimeString());
+    const dsv_password = core.getInput('dsv_password');
+    core.setSecret(dsv_password);
+
+    const dsv_path = core.getInput('dsv_path');
+
+    core.info(`Fetching secrets from ${dsv_path} ...`);
+
+    await dsv(dsv_tenant, dsv_user, dsv_password, dsv_path);
   } catch (error) {
     core.setFailed(error.message);
   }
